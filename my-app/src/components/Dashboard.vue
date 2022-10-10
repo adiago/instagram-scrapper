@@ -1,61 +1,43 @@
 <template>
-  <div class="hello">
-    <Header />
     <div class="container mrgnbtm">
-          <div class="row">
-            <div class="col-md-8">
-                <CreateUser @createUser="userCreate($event)" />
-            </div>
-            <div class="col-md-4">
-                <DisplayBoard :numberOfUsers="numberOfUsers" @getAllUsers="getAllUsers()" />
-            </div>
-          </div>
-    </div>
-    <div class="row mrgnbtm">
-        <Users v-if="users.length > 0" :users="users" />
-    </div>
-  </div>
+      <div class="d-block ml-auto mr-auto" :class="loading" v-if="loading.length"></div>
+      <div v-else>
+        <input type="text" class="form-control form-group" v-model="username" name="username" placeholder="Cuenta instagram">
+        <button type="button" name="btn-username" class="btn btn-success form-group form-control" @click="getInsta()">Buscar</button>
+        <div
+            class="pt-3"
+            v-show="result && typeof result === 'object' && Object.keys(result).length > 0">
+          <b-table hover class="text-center" :items="result"></b-table>
+        </div>
+      </div>
+      </div>
 </template>
 
 <script>
-import Header from './Header.vue'
-import CreateUser from './CreateUser.vue'
-import DisplayBoard from './DisplayBoard.vue'
-import Users from './Users.vue'
-import { getAllUsers, createUser } from '../services/UserService'
+
+import { getInstagram } from '../services/UserService'
 
 export default {
   name: 'Dashboard',
   components: {
-    Header,
-    CreateUser,
-    DisplayBoard,
-    Users
   },
   data() {
       return {
-          users: [],
-          numberOfUsers: 0
+        username: null,
+        result: [],
+        loading: false
       }
   },
   methods: {
-    getAllUsers() {
-      getAllUsers().then(response => {
-        console.log(response)
-        this.users = response
-        this.numberOfUsers = this.users.length
-      })
-    },
-    userCreate(data) {
-      console.log('data:::', data)
-      createUser(data).then(response => {
+    getInsta() {
+      if(this.username === null || this.username.length < 1) return
+      this.loading = 'loader'
+      getInstagram(this.username).then(response => {
         console.log(response);
-        this.getAllUsers();
-      });
+        this.loading = ''
+        this.result = [response]
+      })
     }
   },
-  mounted () {
-    this.getAllUsers();
-  }
 }
 </script>

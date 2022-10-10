@@ -1,5 +1,6 @@
 const express = require('express');
 const randomId = require('random-id');
+const instagram = require('./scrapper-instagram');
 const app = express(),
       bodyParser = require("body-parser");
       port = 3070;
@@ -30,16 +31,47 @@ app.use(bodyParser.json());
 app.use(express.static(process.cwd() + '/my-app/dist'));
 
 app.get('/api/users', (req, res) => {
-  console.log('api/users called!!!!!!!')
-  res.json(users);
-});
+  console.log('get instagram', req)
+  const data = new Promise(function (resolve, reject) {
+    instagram.instaData()
+        .then(data => resolve(data))
+        .catch(err => reject('Insta scrapper failed'))
+  })
+  data
+    .then(function (msg) {
+      console.log(msg)
+      res.json(msg)
+    })
+      .catch(function (error) {
+        console.log(error)
+        res.json(error)
+      })
+})
+
+
+// app.get('/api/users', (req, res) => {
+//   console.log('get instagram', req.query.user)
+//   let data = instagram.getInstaData(req.query.user)
+//   res.json(data)
+//   //console.log('api/users called!!!!!1111!!')
+// });
 
 app.post('/api/user', (req, res) => {
-  const user = req.body.user;
-  user.id = randomId(10);
-  console.log('Adding user:::::', user);
-  users.push(user);
-  res.json("user addedd");
+  console.log('get instagram', req.body.user)
+  const data = new Promise(function (resolve, reject) {
+    instagram.instaData(req.body.user)
+        .then(data => resolve(data))
+        .catch(err => reject('Insta scrapper failed'))
+  })
+  data
+      .then(function (msg) {
+        console.log(msg)
+        res.json(msg)
+      })
+      .catch(function (error) {
+        console.log(error)
+        res.json(error)
+      })
 });
 
 app.get('/', (req,res) => {
